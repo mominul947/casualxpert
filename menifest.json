@@ -1,0 +1,21 @@
+{
+  "name": "Casual Xpert Premium Clothing",
+  "short_name": "Casual Xpert",
+  "description": "Best Premium Online Clothing Brand in Bangladesh",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#004D39",
+  "icons": [
+    {
+      "src": "https://cdn.phototourl.com/free/2026-06-22-37a07071-6319-4d4b-bc86-dce7b3d24ab9.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://cdn.phototourl.com/free/2026-06-22-37a07071-6319-4d4b-bc86-dce7b3d24ab9.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
