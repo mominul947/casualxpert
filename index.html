@@ -2572,15 +2572,14 @@ function fallbackCopyText(text, message) {
     }
     textArea.remove();
 }
-     
-        async function placeOrder() {
+  async function placeOrder() {
     const btn = document.getElementById('place-order-btn');
-    const name = document.getElementById('ship-name').value;
-    const phone = document.getElementById('ship-number').value;
+    const name = document.getElementById('ship-name').value.trim();
+    const phone = document.getElementById('ship-number').value.trim();
     const division = document.getElementById('ship-division').value;
     const district = document.getElementById('ship-district').value;
     const upazila = document.getElementById('ship-upazila').value;
-    const address = document.getElementById('ship-address').value;
+    const address = document.getElementById('ship-address').value.trim();
 
     if (!name || !phone || !division || !district || !upazila || !address) {
         return premiumAlert('error', 'Required!', 'শিপিং তথ্য পূরণ করুন।');
@@ -2598,11 +2597,11 @@ function fallbackCopyText(text, message) {
         if (!payAmount || payAmount === '0') return premiumAlert('warning', 'Amount Required', 'পেমেন্টকৃত টাকার পরিমাণ লিখুন।');
     }
 
-    // অর্ডার ডাটা অবজেক্টে ইমেইল ফিল্ডটি আপডেট করা হয়েছে
+    // অর্ডার ডাটা অবজেক্ট
     const orderData = {
         customerName: name,
         customerNumber: phone,
-        customerEmail: currentUser ? currentUser.email : "Guest Order (" + phone + ")", // লগইন না থাকলে গেস্ট দেখাবে
+        customerEmail: currentUser ? currentUser.email : "guest_" + phone, // গেস্টদের জন্য ইউনিক আইডি
         address: {
             division,
             district,
@@ -2624,13 +2623,27 @@ function fallbackCopyText(text, message) {
 
     try {
         await db.collection('orders').add(orderData);
-        premiumAlert('success', 'Success', 'অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!');
+        
+        // ১. কার্ট থেকে অর্ডারকৃত আইটেমগুলো ডিলিট করা
         cart = cart.filter(item => !currentCheckoutItems.find(ci => ci.id === item.id));
         updateCart();
+        
+        // ২. চেকআউট মোডাল বন্ধ করা
         closeCheckout();
-        showAppPage('orders');
+
+        // ৩. সাকসেস মেসেজ ও নেভিগেশন
+        if (currentUser) {
+            // ইউজার লগইন করা থাকলে তাকে অর্ডার লিস্টে পাঠাবে
+            premiumAlert('success', 'অর্ডার সফল!', 'আপনার অর্ডারটি গ্রহণ করা হয়েছে।');
+            showAppPage('orders');
+        } else {
+            // গেস্ট ইউজার হলে তাকে হোম পেজে পাঠাবে যেন সে আবার লগইন পেজে না যায়
+            premiumAlert('success', 'অর্ডার সফল!', 'ধন্যবাদ! আপনার অর্ডারটি গ্রহণ করা হয়েছে। বিস্তারিত জানতে আমরা আপনার সাথে যোগাযোগ করব।');
+            showAppPage('home');
+        }
+
     } catch (e) {
-        alert("Error placing order: " + e.message);
+        premiumAlert('error', 'দুঃখিত!', 'অর্ডারটি সম্পন্ন হয়নি। আবার চেষ্টা করুন। এরর: ' + e.message);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>CONFIRM ORDER</span> <i class="fa-solid fa-circle-check"></i>';
